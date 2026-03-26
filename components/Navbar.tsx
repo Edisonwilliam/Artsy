@@ -84,9 +84,9 @@ export default function Navbar() {
                     {/* Right side: search + cart + notification */}
                     <div className="flex items-center gap-3 relative z-10">
                         {/* Search icon */}
-                        <button 
+                        <button
                             onClick={() => setIsSearchOpen(!isSearchOpen)}
-                            className="cursor-pointer p-1.5 hover:bg-gray-100 rounded-full transition-colors" 
+                            className="cursor-pointer p-1.5 hover:bg-gray-100 rounded-full transition-colors"
                             aria-label="Search"
                         >
                             <svg
@@ -128,9 +128,9 @@ export default function Navbar() {
 
                         {/* Notification bell - desktop only */}
                         <div className="relative">
-                            <button 
+                            <button
                                 onClick={() => setShowNotifications(!showNotifications)}
-                                className="cursor-pointer p-1.5 hover:bg-gray-100 rounded-full transition-colors relative" 
+                                className="cursor-pointer p-1.5 hover:bg-gray-100 rounded-full transition-colors relative"
                                 aria-label="Notifications"
                             >
                                 <svg
@@ -158,7 +158,7 @@ export default function Navbar() {
                                 <div className="absolute top-12 right-0 w-80 bg-white border border-gray-200 rounded-2xl shadow-xl py-4 z-50 animate-[scaleIn_0.2s_ease-out] origin-top-right">
                                     <div className="px-5 pb-3 border-b border-gray-100 flex items-center justify-between">
                                         <h3 className="font-bold text-sm">Notifications</h3>
-                                        <button 
+                                        <button
                                             onClick={() => setShowNotifications(false)}
                                             className="text-[10px] font-bold text-blue-500 uppercase tracking-wider hover:underline cursor-pointer"
                                         >

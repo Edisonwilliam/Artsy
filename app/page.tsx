@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import { useAppContext } from "@/context/AppContext";
+import { motion } from "framer-motion";
 
 /* ── Hero grid images ── */
 const heroImages = [
@@ -63,14 +64,7 @@ export default function Home() {
   const { addNotification } = useAppContext();
   const [isHomeNotified, setIsHomeNotified] = useState(false);
 
-  /* Image stack for mobile (reuse old behavior) */
-  const [mobileStack, setMobileStack] = useState(heroImages.map((h) => h.src));
-  const bringToFront = (index: number) => {
-    const newStack = [...mobileStack];
-    const clicked = newStack.splice(index, 1)[0];
-    newStack.unshift(clicked);
-    setMobileStack(newStack);
-  };
+
 
   return (
     <main className="pt-20 bg-white text-black">
@@ -92,50 +86,41 @@ export default function Home() {
           </p>
         </div>
 
-        {/* ── Desktop: 5 image grid ── */}
-        <div className="hidden lg:grid lg:grid-cols-5 gap-4 mt-10">
-          {heroImages.map((img, i) => (
+      </section>
+
+      {/* ── Hero Image Marquee (Infinite Scroll - Full Width) ── */}
+      <div className="mt-12 md:mt-20 overflow-hidden relative group">
+        {/* Subtle edge gradients for smooth fade-in/out */}
+        <div className="absolute left-0 top-0 bottom-0 w-24 md:w-64 bg-gradient-to-r from-white via-white/40 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 md:w-64 bg-gradient-to-l from-white via-white/40 to-transparent z-10 pointer-events-none" />
+        
+        <motion.div 
+            className="flex gap-4 md:gap-8 w-max"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ 
+              duration: 40, 
+              repeat: Infinity, 
+              ease: "linear" 
+            }}
+        >
+          {/* Double the images to create seamless loop */}
+          {[...heroImages, ...heroImages].map((img, i) => (
             <div
               key={i}
-              className="relative aspect-[3/4] rounded-xl overflow-hidden group"
+              className="relative w-[280px] md:w-[360px] lg:w-[420px] aspect-[4/5] rounded-3xl overflow-hidden shadow-sm group/img flex-shrink-0"
             >
               <Image
                 src={img.src}
                 alt={img.alt}
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                sizes="20vw"
+                className="object-cover group-hover/img:scale-110 transition-transform duration-700"
+                sizes="(max-width: 768px) 280px, 420px"
               />
+              <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-3xl" />
             </div>
           ))}
-        </div>
-
-        {/* ── Mobile: Image stack ── */}
-        <div className="lg:hidden mt-10 flex justify-center items-center">
-          <div className="relative w-[280px] h-[320px]">
-            {mobileStack.map((img, index) => (
-              <div
-                key={img}
-                onClick={() => bringToFront(index)}
-                className="absolute cursor-pointer transition-all duration-500"
-                style={{
-                  zIndex: mobileStack.length - index,
-                  transform: `translateX(${index * 20}px) rotate(${index * 3}deg)`,
-                }}
-              >
-                <Image
-                  src={img}
-                  alt="stack image"
-                  width={260}
-                  height={300}
-                  className="rounded-xl shadow-lg object-cover"
-                  style={{ width: 260, height: 300 }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </motion.div>
+      </div>
 
       {/* ═══════════════════ FEATURED PRODUCTS ═══════════════════ */}
       <section className="px-5 md:px-12 lg:px-20 max-w-[1400px] mx-auto mt-20 md:mt-28">
@@ -153,7 +138,13 @@ export default function Home() {
                 className={`flex items-stretch gap-10 ${isReversed ? "flex-row-reverse" : "flex-row"}`}
               >
                 {/* Image */}
-                <div className="relative w-1/2 aspect-[4/3] rounded-xl overflow-hidden">
+                <motion.div 
+                  initial={{ x: 150, opacity: 0, rotate: 5 }}
+                  whileInView={{ x: 0, opacity: 1, rotate: 0 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  viewport={{ once: true }}
+                  className="relative w-1/2 aspect-[4/3] rounded-xl overflow-hidden"
+                >
                   <Image
                     src={item.image}
                     alt={item.imageAlt}
@@ -161,7 +152,7 @@ export default function Home() {
                     className="object-cover"
                     sizes="50vw"
                   />
-                </div>
+                </motion.div>
 
                 {/* Info */}
                 <div className="w-1/2 flex flex-col justify-center">
@@ -258,8 +249,15 @@ export default function Home() {
         {/* Desktop: 4-image banner with dark overlay */}
         <div className="hidden lg:block relative rounded-2xl overflow-hidden shadow-2xl group">
           <div className="grid grid-cols-4 h-[420px]">
-            {auctionImages.map((img, i) => (
-              <div key={i} className="relative border-r border-white/10 last:border-0 overflow-hidden">
+             {auctionImages.map((img, i) => (
+              <motion.div 
+                key={i} 
+                initial={{ x: 100, opacity: 0, rotate: 8 }}
+                whileInView={{ x: 0, opacity: 1, rotate: 0 }}
+                transition={{ duration: 0.8, delay: i * 0.15, ease: "easeOut" }}
+                viewport={{ once: true }}
+                className="relative border-r border-white/10 last:border-0 overflow-hidden"
+              >
                 <Image
                   src={img.src}
                   alt="Auction"
@@ -277,7 +275,7 @@ export default function Home() {
                       </span>
                    </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -414,43 +412,31 @@ export default function Home() {
             </div>
 
             {/* Creator image row */}
-            <div className="flex items-end gap-6 mt-10">
-              <div className="relative w-48 h-64 rounded-xl overflow-hidden flex-shrink-0">
-                <Image
-                  src="/Top Creators Animation (1).png"
-                  alt="Top Creator"
-                  fill
-                  className="object-cover"
-                  sizes="200px"
-                />
-              </div>
-              <div className="relative w-48 h-52 rounded-xl overflow-hidden flex-shrink-0">
-                <Image
-                  src="/Featured product (1).png"
-                  alt="Top Creator"
-                  fill
-                  className="object-cover"
-                  sizes="200px"
-                />
-              </div>
-              <div className="relative w-48 h-60 rounded-xl overflow-hidden flex-shrink-0">
-                <Image
-                  src="/Rectangle 62.png"
-                  alt="Top Creator"
-                  fill
-                  className="object-cover"
-                  sizes="200px"
-                />
-              </div>
-              <div className="relative w-48 h-48 rounded-xl overflow-hidden flex-shrink-0">
-                <Image
-                  src="/Rectangle 50 (1).png"
-                  alt="Top Creator"
-                  fill
-                  className="object-cover"
-                  sizes="200px"
-                />
-              </div>
+             <div className="flex items-end gap-6 mt-10">
+              {[
+                { src: "/Top Creators Animation (1).png", w: 48, h: 64, delay: 0 },
+                { src: "/Featured product (1).png", w: 48, h: 52, delay: 0.1 },
+                { src: "/Rectangle 62.png", w: 48, h: 60, delay: 0.2 },
+                { src: "/Rectangle 50 (1).png", w: 48, h: 48, delay: 0.3 }
+              ].map((img, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ x: 100, opacity: 0, rotate: 12 }}
+                  whileInView={{ x: 0, opacity: 1, rotate: 0 }}
+                  transition={{ duration: 0.7, delay: img.delay, ease: "easeOut" }}
+                  viewport={{ once: true }}
+                  className="relative w-48 rounded-xl overflow-hidden flex-shrink-0"
+                  style={{ height: `${img.h * 4}px` }}
+                >
+                  <Image
+                    src={img.src}
+                    alt="Top Creator"
+                    fill
+                    className="object-cover"
+                    sizes="200px"
+                  />
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
